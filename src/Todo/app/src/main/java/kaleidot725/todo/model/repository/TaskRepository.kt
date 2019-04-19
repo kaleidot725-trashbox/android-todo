@@ -3,7 +3,7 @@ package kaleidot725.todo.model.repository
 import kaleidot725.todo.model.entity.Task
 
 interface TaskRepository {
-    fun load()
+    fun init()
 
     fun all() : List<Task>
     fun active() : List<Task>

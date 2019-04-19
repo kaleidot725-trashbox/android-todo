@@ -4,6 +4,7 @@ import android.util.Log
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.Types
+import kaleidot725.todo.model.entity.Task
 import java.io.File
 import java.lang.reflect.ParameterizedType
 
@@ -28,9 +29,11 @@ class JsonPersistence<T>(name : String, clazz : Class<T>) : Persistence<T> {
     override fun load(): List<T> {
         try {
             val file = File(name)
-            val contents = file.absoluteFile.bufferedReader().use { it.readText() }
-            val items = adapter.fromJson(contents)
-            return if (items != null) items else arrayListOf<T>()
+            if (file.exists()) {
+                val contents = file.absoluteFile.bufferedReader().use { it.readText() }
+                return adapter.fromJson(contents) ?: arrayListOf()
+            }
+            return arrayListOf()
         } catch (e: Exception) {
             Log.d(this.javaClass.name.toString(), e.toString())
             throw e
