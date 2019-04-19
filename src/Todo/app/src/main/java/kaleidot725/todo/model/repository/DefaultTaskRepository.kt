@@ -8,19 +8,13 @@ class DefaultTaskRepository(persistence : Persistence<Task>) : TaskRepository {
     private val persistence : Persistence<Task> = persistence
     private var initialized : Boolean = false
     private lateinit var list : MutableList<Task>
-    private val values : List<Task> = mutableListOf(
-        Task("1", "ABCDEFG", false),
-        Task("2", "HIJKLMN", true),
-        Task("3", "1234567", false),
-        Task("4", "0987654", true),
-        Task("5", "3456789", false))
 
     override fun init() {
         if (initialized) {
             return
         }
 
-        list = values.toMutableList()
+        list = persistence.load().toMutableList()
         initialized = true
     }
 
