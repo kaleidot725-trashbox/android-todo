@@ -13,7 +13,6 @@ class TaskViewModel(navigator: MainNavigator, repository: TaskRepository, task :
 
     val name : MutableLiveData<String> = MutableLiveData()
     val checked : MutableLiveData<Boolean> = MutableLiveData()
-    var disposed : (() -> Unit)? = null
 
     init {
         name.postValue(task.name)
@@ -22,7 +21,6 @@ class TaskViewModel(navigator: MainNavigator, repository: TaskRepository, task :
 
     fun delete(view : View) {
         repository.delete(task)
-        disposed?.invoke()
     }
 
     fun check(view : View) {

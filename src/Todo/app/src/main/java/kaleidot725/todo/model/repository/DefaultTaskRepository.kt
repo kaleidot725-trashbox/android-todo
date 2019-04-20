@@ -1,5 +1,7 @@
 package kaleidot725.todo.model.repository
 
+import androidx.databinding.ObservableArrayList
+import androidx.databinding.ObservableList
 import kaleidot725.todo.model.entity.Task
 import kaleidot725.todo.model.persistence.Persistence
 
@@ -7,14 +9,15 @@ class DefaultTaskRepository(persistence : Persistence<Task>) : TaskRepository {
 
     private val persistence : Persistence<Task> = persistence
     private var initialized : Boolean = false
-    private lateinit var list : MutableList<Task>
+    private var list : ObservableList<Task> = ObservableArrayList<Task>()
 
     override fun init() {
         if (initialized) {
             return
         }
 
-        list = persistence.load().toMutableList()
+//        list.addAll(persistence.load())
+        list.addAll(arrayListOf<Task>(Task(Task.createID(), "1234567", false), Task(Task.createID(), "abcdefg", false)))
         initialized = true
     }
 
@@ -78,5 +81,23 @@ class DefaultTaskRepository(persistence : Persistence<Task>) : TaskRepository {
         list.remove(deleteTask)
         list.add(deleteIndex, task)
         persistence.save(list)
+    }
+
+    override fun addOnChangedCallback(callback : ObservableList.OnListChangedCallback<ObservableList<Task>>)
+    {
+        if (!initialized) {
+            throw IllegalStateException("Not initialized\n")
+        }
+
+        list.addOnListChangedCallback(callback)
+    }
+
+    override fun removeOnChangedCallback(callback : ObservableList.OnListChangedCallback<ObservableList<Task>>)
+    {
+        if (!initialized) {
+            throw IllegalStateException("Not initialized\n")
+        }
+
+        list.removeOnListChangedCallback(callback)
     }
 }

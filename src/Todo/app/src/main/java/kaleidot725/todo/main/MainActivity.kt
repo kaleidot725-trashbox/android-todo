@@ -1,11 +1,8 @@
 package kaleidot725.todo.main
 
-import android.app.Application
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import androidx.appcompat.app.ActionBar
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import kaleidot725.todo.R
@@ -13,15 +10,15 @@ import kaleidot725.todo.model.entity.Task
 import kaleidot725.todo.model.persistence.JsonPersistence
 import kaleidot725.todo.model.repository.DefaultTaskRepository
 import kaleidot725.todo.model.repository.TaskRepository
-import java.lang.Exception
 import android.app.AlertDialog
 import android.widget.EditText
 import android.widget.LinearLayout
+import androidx.lifecycle.Observer
 
 class MainActivity : AppCompatActivity(), MainNavigator {
     private lateinit var mainViewModel: MainViewModel
     private lateinit var taskViewModels : MutableList<TaskViewModel>
-    private lateinit var viewAdapter: RecyclerView.Adapter<*>
+    private lateinit var viewAdapter: TaskAdapter
     private lateinit var viewManager: RecyclerView.LayoutManager
     private lateinit var repository: TaskRepository
 
@@ -34,30 +31,16 @@ class MainActivity : AppCompatActivity(), MainNavigator {
         repository = DefaultTaskRepository(JsonPersistence<Task>(application.filesDir.path + "task.json", Task::class.java))
         repository.init()
 
-        mainViewModel = MainViewModelFactory(application, repository).create(MainViewModel::class.java)
-        taskViewModels = mutableListOf()
-
+        mainViewModel = MainViewModelFactory(application, this, repository).create(MainViewModel::class.java)
         viewManager = LinearLayoutManager(this)
-        viewAdapter = TaskAdapter(this, taskViewModels)
+        viewAdapter = TaskAdapter(this, mainViewModel.taskViewModels.value ?: arrayListOf<TaskViewModel>())
+        mainViewModel.taskViewModels.observe(this, Observer{ viewAdapter.update(it) })
+
         this.findViewById<RecyclerView>(R.id.task_list).apply {
             setHasFixedSize(true)
             layoutManager = viewManager
             adapter = viewAdapter
         }
-
-        // ViewModelの実態を管理するのはActivityとする。
-        // なのでいらなくなったタイミングでコールバックで通知しRecyclerViewから消す
-        for (task in repository.all()) {
-            val vm = TaskViewModelFactory(application, this, repository, task).create(TaskViewModel::class.java).also {
-                it.disposed = {
-                    taskViewModels.remove(it)
-                    viewAdapter.notifyDataSetChanged()
-                }
-            }
-            taskViewModels.add(vm)
-        }
-
-        viewAdapter.notifyDataSetChanged()
     }
 
     override fun editTextDialog(title : String, current : String, apply: (name: String) -> Unit) {
@@ -77,35 +60,5 @@ class MainActivity : AppCompatActivity(), MainNavigator {
         builder.setPositiveButton("OK") { dialog, it -> apply.invoke(input.text.toString())}
         builder.setNegativeButton("Cancel") { dialog, it -> dialog.cancel() }
         builder.show()
-    }
-
-    private class MainViewModelFactory(
-        application: Application,
-        val repository : TaskRepository)
-        : ViewModelProvider.AndroidViewModelFactory(application) {
-
-        override fun <T : ViewModel?> create(modelClass: Class<T>): T {
-            if (modelClass == kaleidot725.todo.main.MainViewModel::class.java) {
-                return (MainViewModel(repository) as T)
-            }
-
-            throw Exception("Invalid Model Class")
-        }
-    }
-
-    private class TaskViewModelFactory(
-        application: Application,
-        val navigator : MainNavigator,
-        val repository : TaskRepository,
-        val task : Task)
-        : ViewModelProvider.AndroidViewModelFactory(application) {
-
-        override fun <T : ViewModel?> create(modelClass: Class<T>): T {
-            if (modelClass == TaskViewModel::class.java) {
-                return TaskViewModel(navigator, repository, task) as T
-            }
-
-            throw Exception("Invalid Model Class")
-        }
     }
 }
