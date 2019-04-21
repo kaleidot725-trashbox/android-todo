@@ -9,17 +9,18 @@
 
     <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_margin="5dp">
+            android:layout_height="wrap_content">
 
         <LinearLayout
                 android:id="@+id/checked_container"
+                android:gravity="center"
                 android:layout_width="50dp"
                 android:layout_height="50dp"
                 app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintHorizontal_bias="0.5"
                 app:layout_constraintEnd_toStartOf="@+id/name">
+
             <CheckBox
                     android:id="@+id/checked"
                     android:layout_width="wrap_content"

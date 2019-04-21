@@ -16,8 +16,7 @@ class DefaultTaskRepository(persistence : Persistence<Task>) : TaskRepository {
             return
         }
 
-//        list.addAll(persistence.load())
-        list.addAll(arrayListOf<Task>(Task(Task.createID(), "1234567", false), Task(Task.createID(), "abcdefg", false)))
+        list.addAll(persistence.load())
         initialized = true
     }
 
@@ -26,7 +25,7 @@ class DefaultTaskRepository(persistence : Persistence<Task>) : TaskRepository {
             throw IllegalStateException("Not initialized\n")
         }
 
-        return list
+        return list.toList()
     }
 
     override fun active(): List<Task> {
@@ -58,7 +57,7 @@ class DefaultTaskRepository(persistence : Persistence<Task>) : TaskRepository {
             throw IllegalStateException("Not initialized\n")
         }
 
-        list.add(task)
+        list.add(0, task)
         persistence.save(list)
     }
 

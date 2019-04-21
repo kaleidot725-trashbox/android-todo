@@ -32,18 +32,37 @@
                     android:layout_width="50dp"
                     android:layout_height="50dp"
                     android:background="#00000000"
-                    android:src="@drawable/down_when_selecting_allitem"/>
+                    android:onClick="@{vm::check}"
+                    android:src="@drawable/down"/>
 
             <EditText
                     android:id="@+id/task_name_edittext"
                     app:layout_constraintStart_toEndOf="@id/check_all_button"
                     app:layout_constraintTop_toTopOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintEnd_toStartOf="@id/add_button"
                     app:layout_constraintHorizontal_chainStyle="spread_inside"
                     app:layout_constraintHorizontal_weight="0.9"
                     android:layout_width="0dp"
                     android:layout_height="50dp"
+                    android:imeOptions="actionDone"
+                    android:singleLine="true"
+                    android:text="@={vm.taskName}"
                     android:hint="@string/taskname_hint"/>
+
+            <ImageButton
+                    android:id="@+id/add_button"
+                    app:layout_constraintStart_toEndOf="@id/task_name_edittext"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintHorizontal_chainStyle="spread_inside"
+                    app:layout_constraintHorizontal_weight="0.1"
+                    android:clickable="true"
+                    android:foreground="?android:attr/selectableItemBackground"
+                    android:layout_width="50dp"
+                    android:layout_height="50dp"
+                    android:background="#00000000"
+                    android:onClick="@{vm::add}"
+                    android:src="@drawable/plus"/>
         </androidx.constraintlayout.widget.ConstraintLayout>
 
         <androidx.constraintlayout.widget.ConstraintLayout
@@ -72,11 +91,9 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:textSize="12dp"
-                    android:text="X item left"
+                    android:text="@{vm.leftCount}"
                     android:textAlignment="center"
                     android:padding="4dp"
-                    android:clickable="true"
-                    android:foreground="?android:attr/selectableItemBackground"
                     app:layout_constraintTop_toTopOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintEnd_toStartOf="@+id/all_togglebutton"/>
@@ -90,8 +107,7 @@
                     android:textAlignment="center"
                     android:padding="4dp"
                     android:background="@drawable/border_background"
-                    android:clickable="true"
-                    android:foreground="?android:attr/selectableItemBackground"
+                    android:onClick="@{vm::selectAll}"
                     app:layout_constraintTop_toTopOf="parent"
                     app:layout_constraintStart_toEndOf="@+id/left_item_textview"
                     app:layout_constraintEnd_toStartOf="@+id/active_togglebutton"/>
@@ -107,6 +123,7 @@
                     android:background="@drawable/border_background"
                     android:clickable="true"
                     android:foreground="?android:attr/selectableItemBackground"
+                    android:onClick="@{vm::selectActive}"
                     app:layout_constraintTop_toTopOf="parent"
                     app:layout_constraintStart_toEndOf="@+id/all_togglebutton"
                     app:layout_constraintEnd_toStartOf="@+id/completed_togglebutton"/>
@@ -120,8 +137,7 @@
                     android:textAlignment="center"
                     android:padding="4dp"
                     android:background="@drawable/border_background"
-                    android:clickable="true"
-                    android:foreground="?android:attr/selectableItemBackground"
+                    android:onClick="@{vm::selectCompleted}"
                     app:layout_constraintTop_toTopOf="parent"
                     app:layout_constraintStart_toEndOf="@+id/active_togglebutton"
                     app:layout_constraintEnd_toStartOf="@+id/clear_togglebutton"/>
@@ -136,6 +152,7 @@
                     android:padding="4dp"
                     android:clickable="true"
                     android:foreground="?android:attr/selectableItemBackground"
+                    android:onClick="@{vm::clearCompleted}"
                     app:layout_constraintTop_toTopOf="parent"
                     app:layout_constraintStart_toEndOf="@+id/completed_togglebutton"
                     app:layout_constraintEnd_toEndOf="parent"/>
