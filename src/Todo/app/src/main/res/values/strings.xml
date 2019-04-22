@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Todo</string>
+    <string name="app_name">TODO</string>
     <string name="app_title">TODOS</string>
     <string name="taskname_hint">What needs to be done?</string>
 </resources>
