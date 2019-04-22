@@ -16,30 +16,29 @@ import android.widget.LinearLayout
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.Observer
 import kaleidot725.todo.databinding.ActivityMainBinding
+import kaleidot725.todo.model.SingletonModels
 
 class MainActivity : AppCompatActivity(), MainNavigator {
     private lateinit var mainViewModel: MainViewModel
-    private lateinit var taskViewModels : MutableList<TaskViewModel>
     private lateinit var viewAdapter: TaskAdapter
     private lateinit var viewManager: RecyclerView.LayoutManager
-    private lateinit var repository: TaskRepository
+    private lateinit var taskObserver : Observer<List<TaskViewModel>>
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         supportActionBar?.displayOptions = ActionBar.DISPLAY_SHOW_CUSTOM
         supportActionBar?.setCustomView(R.layout.action_bar)
 
-        repository = DefaultTaskRepository(JsonPersistence<Task>(application.filesDir.path + "task.json", Task::class.java))
-        repository.init()
-
-        mainViewModel = MainViewModelFactory(application, this, repository).create(MainViewModel::class.java)
+        mainViewModel = MainViewModelFactory(application, this, SingletonModels.taskResposiory).create(MainViewModel::class.java)
         val binding: ActivityMainBinding = DataBindingUtil.setContentView(this, R.layout.activity_main)
         binding.lifecycleOwner = this
         binding.vm = mainViewModel
 
         viewManager = LinearLayoutManager(this)
         viewAdapter = TaskAdapter(this, mainViewModel.taskViewModels.value ?: arrayListOf<TaskViewModel>())
-        mainViewModel.taskViewModels.observe(this, Observer{ viewAdapter.update(it) })
+
+        taskObserver = Observer { viewAdapter.update(it) }
+        mainViewModel.taskViewModels.observe(this, taskObserver)
         this.findViewById<RecyclerView>(R.id.task_list).apply {
             setHasFixedSize(true)
             layoutManager = viewManager
@@ -47,8 +46,12 @@ class MainActivity : AppCompatActivity(), MainNavigator {
         }
     }
 
-    override fun editTextDialog(title : String, current : String, apply: (name: String) -> Unit) {
+    override fun onDestroy() {
+        super.onDestroy()
+        mainViewModel.taskViewModels.removeObserver(taskObserver)
+    }
 
+    override fun editTextDialog(title : String, current : String, apply: (name: String) -> Unit) {
         val lp = LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT)
         lp.setMargins(30, 5, 5, 5)
 

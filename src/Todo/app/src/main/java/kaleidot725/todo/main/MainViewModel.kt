@@ -16,8 +16,7 @@ class MainViewModel(application : Application, navigator : MainNavigator, taskRe
     private val taskRepository : TaskRepository = taskRepository
     private var currentSelectType : TaskSelectType = TaskSelectType.ALL
     private val changedCallback = object : ObservableList.OnListChangedCallback<ObservableList<Task>>() {
-        override fun onItemRangeInserted(sender: ObservableList<Task>?, positionStart: Int, itemCount: Int)
-        {
+        override fun onItemRangeInserted(sender: ObservableList<Task>?, positionStart: Int, itemCount: Int) {
             if(sender != null) { update(currentSelectType) }
         }
 
@@ -38,17 +37,18 @@ class MainViewModel(application : Application, navigator : MainNavigator, taskRe
     val taskViewModels : LiveData<List<TaskViewModel>> get() { return mutableTaskViewModels }
     val taskName : MutableLiveData<String> = MutableLiveData()
     val leftCount : MutableLiveData<String> = MutableLiveData()
+    val allChecked : MutableLiveData<Boolean> = MutableLiveData()
+    val activeChecked : MutableLiveData<Boolean> = MutableLiveData()
+    val completedChecked : MutableLiveData<Boolean> = MutableLiveData()
 
     init {
-        val vms = mutableListOf<TaskViewModel>()
-        for (task in taskRepository.all()) {
-            vms.add(TaskViewModelFactory(application, navigator, taskRepository, task).create(TaskViewModel::class.java))
-        }
-        mutableTaskViewModels.value = vms
-        taskName.value = ""
-        leftCount.value = "${taskRepository.active().count()} left item"
-
+        update(currentSelectType)
         onChangedEnable()
+    }
+
+    override fun onCleared() {
+        onChangedDisable()
+        super.onCleared()
     }
 
     fun add(view : View) {
@@ -106,11 +106,6 @@ class MainViewModel(application : Application, navigator : MainNavigator, taskRe
         update(TaskSelectType.COMPLETED)
     }
 
-    override fun onCleared() {
-        onChangedDisable()
-        super.onCleared()
-    }
-
     private fun onChangedEnable() {
         taskRepository.addOnChangedCallback(changedCallback)
     }
@@ -134,6 +129,10 @@ class MainViewModel(application : Application, navigator : MainNavigator, taskRe
         }
 
         mutableTaskViewModels.postValue(vms)
+        taskName.postValue(taskName.value ?: "")
         leftCount.postValue("${taskRepository.active().count()} left item")
+        allChecked.postValue((type == TaskSelectType.ALL))
+        activeChecked.postValue((type == TaskSelectType.ACTIVE))
+        completedChecked.postValue((type == TaskSelectType.COMPLETED))
     }
 }

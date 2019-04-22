@@ -19,6 +19,10 @@ class TaskViewModel(navigator: MainNavigator, repository: TaskRepository, task :
         checked.postValue(task.checked)
     }
 
+    override fun onCleared() {
+        super.onCleared()
+    }
+
     fun delete(view : View) {
         repository.delete(task)
     }
