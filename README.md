@@ -1,4 +1,4 @@
-## このプロジェクトについて
+## このプロジェクトの概要
 
 [TodoMVC](<http://todomvc.com/>)のようなTODOアプリをAndroidとKotlinで開発しているプロジェクトです。
 
