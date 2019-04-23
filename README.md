@@ -10,5 +10,7 @@
 
 ## このプロジェクトの技術
 
-…
+… [MVVM](https://developer.android.com/jetpack/docs/guide)
+- [Android Architecture Component](https://developer.android.com/topic/libraries/architecture)
+- [moshi](https://github.com/square/moshi)
 
